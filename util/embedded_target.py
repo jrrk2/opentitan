@@ -42,13 +42,26 @@ def run_srec_cat(srec_cat, input, basename, outdir):
     subprocess.run(cmd, check=True)
 
 
+def run_vlog_cnv(objcopy, input, basename, outdir):
+    # TODO: We need a reliable way to specify the ROM
+    # This way is adapted from the LowRISC 64-bit flow
+    output = os.path.join(outdir, basename + '.vlog')
+    outmem = os.path.join(outdir, basename + '.mem')
+    outsv  = os.path.join(outdir, basename + '.sv')
+    subprocess.run([objcopy, '-O', 'verilog', input, output], check=True)
+    print ( '{:s}'.format(sys.argv[0]))
+    sys.argv[0] + '.cnvmem.sv'
+    converter = sys.argv[0] + '.cnvmem.vvp'
+    subprocess.run(['/usr/bin/iverilog', '-o', converter, sys.argv[0] + '.cnvmem.sv'], check=True)
+    subprocess.run([converter, '+VLOG=' + output, '+MEM=' + outmem, '+SV=' + outsv], check=True)
+    
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--basename',
         '-b',
         required=True,
-        help='File basename used as preffix in output filenames.')
+        help='File basename used as prefix in output filenames.')
     parser.add_argument(
         '--input',
         '-i',
@@ -81,7 +94,8 @@ def main():
 
     bin_file = run_objcopy(args.objcopy, args.input, args.basename, args.outdir)
     run_objdump(args.objdump, args.input, args.basename, args.outdir)
-    run_srec_cat(args.srec_cat, bin_file, args.basename, args.outdir)
+#    run_srec_cat(args.srec_cat, bin_file, args.basename, args.outdir)
+    run_vlog_cnv(args.objcopy, args.input, args.basename, args.outdir)
 
 
 if __name__ == "__main__":

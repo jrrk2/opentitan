@@ -3,6 +3,7 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
+set -x
 set -e
 
 # export_target.sh is intended to be invoked by Meson, to work around Meson's
